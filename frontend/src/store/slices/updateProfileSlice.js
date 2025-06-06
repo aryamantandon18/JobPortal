@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const updateProfileSlice = createSlice({
   name: "updateProfile",
@@ -47,8 +48,7 @@ export const updateProfile = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updateProfileRequest());
   try {
     const response = await axios.put(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/update/profile",
-      "http://localhost:4000/api/v1/user/update/profile",
+      `${baseURL}/update/profile`,
       data,
       {
         withCredentials: true,
@@ -59,17 +59,17 @@ export const updateProfile = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updateProfileFailed(
-        error.response.data.message || "Failed to update profile."
+        error.response?.data?.message || "Failed to update profile."
       )
     );
   }
 };
+
 export const updatePassword = (data) => async (dispatch) => {
   dispatch(updateProfileSlice.actions.updatePasswordRequest());
   try {
     const response = await axios.put(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/update/password",
-      "http://localhost:4000/api/v1/user/update/password",
+      `${baseURL}/update/password`,
       data,
       {
         withCredentials: true,
@@ -80,11 +80,13 @@ export const updatePassword = (data) => async (dispatch) => {
   } catch (error) {
     dispatch(
       updateProfileSlice.actions.updatePasswordFailed(
-        error.response.data.message || "Failed to update password."
+        error.response?.data?.message || "Failed to update password."
       )
     );
   }
 };
+
+
 
 export const clearAllUpdateProfileErrors = () => (dispatch) => {
   dispatch(updateProfileSlice.actions.profileResetAfterUpdate());

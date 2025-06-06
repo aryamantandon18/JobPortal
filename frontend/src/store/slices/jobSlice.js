@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const jobSlice = createSlice({
   name: "jobs",
@@ -108,44 +109,28 @@ export const fetchJobs =
   async (dispatch) => {
     try {
       dispatch(jobSlice.actions.requestForAllJobs());
-      // let link = "https://jobquest-backend-oaci.onrender.com/api/v1/job/getall?";
-      let link = "http://localhost:4000/api/v1/job/getall?";
+      let link = `${baseURL}/getall?`;
       let queryParams = [];
-      if (searchKeyword) {
-        queryParams.push(`searchKeyword=${searchKeyword}`);
-      }
+
+      if (searchKeyword) queryParams.push(`searchKeyword=${searchKeyword}`);
+
       if (city && city !== "All") {
         queryParams.push(`city=${city}`);
+      } else if (city === "All") {
+        // BUG No.3 fix
+        queryParams = searchKeyword ? [`searchKeyword=${searchKeyword}`] : [];
       }
 
-      /***************************************************/
-      /* BUG No.3 */
-      if (city && city === "All") {
-        queryParams = [];
-        if (searchKeyword) {
-          queryParams.push(`searchKeyword=${searchKeyword}`);
-        }
-      }
-      /***************************************************/
-
-      if (niche) {
+      if (niche && niche !== "All") {
         queryParams.push(`niche=${niche}`);
+      } else if (niche === "All") {
+        // BUG No.4 fix
+        queryParams = searchKeyword ? [`searchKeyword=${searchKeyword}`] : [];
+        if (city && city !== "All") queryParams.push(`city=${city}`);
       }
-
-      /***************************************************/
-      /* BUG No.4 */
-      if (niche && niche === "All") {
-        queryParams = [];
-        if (searchKeyword) {
-          queryParams.push(`searchKeyword=${searchKeyword}`);
-        }
-        if (city && city !== "All") {
-          queryParams.push(`city=${city}`);
-        }
-      }
-      /***************************************************/
 
       link += queryParams.join("&");
+
       const response = await axios.get(link, { withCredentials: true });
       dispatch(jobSlice.actions.successForAllJobs(response.data.jobs));
       dispatch(jobSlice.actions.clearAllErrors());
@@ -157,11 +142,9 @@ export const fetchJobs =
 export const fetchSingleJob = (jobId) => async (dispatch) => {
   dispatch(jobSlice.actions.requestForSingleJob());
   try {
-    const response = await axios.get(
-      // `https://jobquest-backend-oaci.onrender.com/api/v1/job/get/${jobId}`,
-      `http://localhost:4000/api/v1/job/get/${jobId}`,
-      { withCredentials: true }
-    );
+    const response = await axios.get(`${baseURL}/get/${jobId}`, {
+      withCredentials: true,
+    });
     dispatch(jobSlice.actions.successForSingleJob(response.data.job));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
@@ -172,12 +155,10 @@ export const fetchSingleJob = (jobId) => async (dispatch) => {
 export const postJob = (data) => async (dispatch) => {
   dispatch(jobSlice.actions.requestForPostJob());
   try {
-    const response = await axios.post(
-      // `https://jobquest-backend-oaci.onrender.com/api/v1/job/post`,
-      `http://localhost:4000/api/v1/job/post`,
-      data,
-      { withCredentials: true, headers: { "Content-Type": "application/json" } }
-    );
+    const response = await axios.post(`${baseURL}/post`, data, {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    });
     dispatch(jobSlice.actions.successForPostJob(response.data.message));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
@@ -188,11 +169,9 @@ export const postJob = (data) => async (dispatch) => {
 export const getMyJobs = () => async (dispatch) => {
   dispatch(jobSlice.actions.requestForMyJobs());
   try {
-    const response = await axios.get(
-      // `https://jobquest-backend-oaci.onrender.com/api/v1/job/getmyjobs`,
-      `http://localhost:4000/api/v1/job/getmyjobs`,
-      { withCredentials: true }
-    );
+    const response = await axios.get(`${baseURL}/getmyjobs`, {
+      withCredentials: true,
+    });
     dispatch(jobSlice.actions.successForMyJobs(response.data.myJobs));
     dispatch(jobSlice.actions.clearAllErrors());
   } catch (error) {
@@ -203,17 +182,16 @@ export const getMyJobs = () => async (dispatch) => {
 export const deleteJob = (id) => async (dispatch) => {
   dispatch(jobSlice.actions.requestForDeleteJob());
   try {
-    const response = await axios.delete(
-      // `https://jobquest-backend-oaci.onrender.com/api/v1/job/delete/${id}`,
-      `http://localhost:4000/api/v1/job/delete/${id}`,
-      { withCredentials: true }
-    );
+    const response = await axios.delete(`${baseURL}/delete/${id}`, {
+      withCredentials: true,
+    });
     dispatch(jobSlice.actions.successForDeleteJob(response.data.message));
     dispatch(clearAllJobErrors());
   } catch (error) {
     dispatch(jobSlice.actions.failureForDeleteJob(error.response.data.message));
   }
 };
+
 
 export const clearAllJobErrors = () => (dispatch) => {
   dispatch(jobSlice.actions.clearAllErrors());

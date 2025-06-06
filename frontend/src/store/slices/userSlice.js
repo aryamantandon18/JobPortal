@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const userSlice = createSlice({
   name: "user",
@@ -92,8 +93,7 @@ export const register = (data) => async (dispatch) => {
   dispatch(userSlice.actions.registerRequest());
   try {
     const response = await axios.post(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/register",
-      "http://localhost:4000/api/v1/user/register",
+      `${baseURL}/register`,
       data,
       {
         withCredentials: true,
@@ -103,7 +103,7 @@ export const register = (data) => async (dispatch) => {
     dispatch(userSlice.actions.registerSuccess(response.data));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.registerFailed(error.response.data.message));
+    dispatch(userSlice.actions.registerFailed(error.response?.data?.message));
   }
 };
 
@@ -111,8 +111,7 @@ export const login = (data) => async (dispatch) => {
   dispatch(userSlice.actions.loginRequest());
   try {
     const response = await axios.post(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/login",
-      "http://localhost:4000/api/v1/user/login",
+      `${baseURL}/login`,
       data,
       {
         withCredentials: true,
@@ -122,46 +121,36 @@ export const login = (data) => async (dispatch) => {
     dispatch(userSlice.actions.loginSuccess(response.data));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.loginFailed(error.response.data.message));
+    dispatch(userSlice.actions.loginFailed(error.response?.data?.message));
   }
 };
 
 export const getUser = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchUserRequest());
   try {
-    const response = await axios.get(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/getuser",
-      "http://localhost:4000/api/v1/user/getuser",
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await axios.get(`${baseURL}/getuser`, {
+      withCredentials: true,
+    });
     dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
-    dispatch(userSlice.actions.fetchUserFailed(error.response.data.message));
+    dispatch(userSlice.actions.fetchUserFailed(error.response?.data?.message));
   }
 };
+
 export const logout = () => async (dispatch) => {
   try {
-    await axios.get(
-      // "https://jobquest-backend-oaci.onrender.com/api/v1/user/logout",
-      "http://localhost:4000/api/v1/user/logout",
-      {
-        withCredentials: true,
-      }
-    );
+    await axios.get(`${baseURL}/logout`, {
+      withCredentials: true,
+    });
     dispatch(userSlice.actions.logoutSuccess());
     dispatch(userSlice.actions.clearAllErrors());
   } catch (error) {
     const errorMessage =
-      error.response && error.response.data
-        ? error.response.data.message
-        : "Something went wrong!";
+      error.response?.data?.message || "Something went wrong!";
     dispatch(userSlice.actions.logoutFailed(errorMessage));
   }
 };
-
 
 export const clearAllUserErrors = () => (dispatch) => {
   dispatch(userSlice.actions.clearAllErrors());

@@ -4,6 +4,8 @@ import App from './App.jsx'
 import {Provider} from "react-redux"
 import store from "./store/store.js"
 
+export const baseURL = "http://localhost:4000/api/v1";
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />
