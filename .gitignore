@@ -7,11 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-../backend/node_modules
-./node_modules
-../backend/config/config.env
+./backend/node_modules
+./frontend/node_modules
+./backend/config/config.env
 
-.env
+./frontend/.env
 **/.env
 node_modules
 dist
